@@ -1,6 +1,6 @@
 CC = gcc
 EXT = c
-CFLAGS = -Iinclude -g -Wall
+CFLAGS = -g -Wall
 INCLUDE = include
 IFLAGS = -I$(INCLUDE)
 LFLAGS = -lglfw3 -lGL -lm
@@ -19,7 +19,7 @@ ZIP = zip
 all: create_dirs
 all: $(BIN)
 
-release: CFLAGS = -Iinclude -O2
+release: CFLAGS = -O2 -DNDEBUG
 release: all
 
 $(BIN): $(OBJS)
