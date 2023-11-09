@@ -1,14 +1,15 @@
 // C standard headers
 #include <stdbool.h>
 #include <assert.h>
+#include <math.h>
 // External libraries
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // Local headers
 #include <interface.h>
 #include <interface_errors.h>
 
 #define EXIT_SUCCESS                        0
-
 #define ERR_OUT(_check, _errVal, _errStr)   if(_check) { \
                                                 *_errVal = _errStr; \
                                                 return true; \
@@ -28,8 +29,22 @@ static bool get_dim(GLFWmonitor *targetMonitor, Dimension *screenDim, char **err
     return false;
 }
 
-char *interface_init(void) {
-    if (glfwInit() == GLFW_FALSE) return INTERFACE_BAD_GLFW_INIT;
+#include <stdio.h>
+char *interface_init(void (*glfw_error)(int, const char*)) {
+    glfwSetErrorCallback(glfw_error);
+    if (glfwInit() == GL_FALSE) return INTERFACE_BAD_GLFW_INIT;
+
+    #ifndef OPENGL_VER
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    #else
+    float integerSegment;
+    float fractionSegment = modff(OPENGL_VER, &integerSegment);
+    assert(fractionSegment != NAN || integerSegment == INFINITY);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, (int) integerSegment);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, (int) ceil(fractionSegment * 10));
+    #endif
     return NULL;
 }
 
@@ -43,9 +58,12 @@ void *window_init(Dimension size, char *windowName, char **errVal) {
     if(size.width == 0 || size.height == 0 || windowName == NULL || errVal == NULL) return NULL;
     GLFWwindow* newWindow = glfwCreateWindow(size.width, size.height, windowName, NULL, NULL);
 
-    if (newWindow != NULL) glfwMakeContextCurrent(newWindow);
+    if (newWindow != NULL) {
+        glfwMakeContextCurrent(newWindow);
+        gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    }
     else *errVal = INTERFACE_BAD_GLFW_WIN;
-
+    printf("%s\n", glGetString(GL_VERSION));
     return newWindow;
 }
 

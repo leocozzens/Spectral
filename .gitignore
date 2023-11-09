@@ -51,10 +51,14 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-
 # Binaries
 bin/
 obj/
 
 # VSCODE
 .vscode
+
+# Additional libraries
+src/glad.c
+include/glad/
+include/KHR/

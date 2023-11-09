@@ -18,7 +18,7 @@
 static char *errVal = NULL;
 
 int main(void) {
-    errVal = interface_init();
+    errVal = interface_init(action_glfw_error);
     ERR_OUT(errVal != NULL, errVal);
 
     Dimension screenDim;
