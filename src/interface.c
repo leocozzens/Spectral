@@ -29,7 +29,6 @@ static bool get_dim(GLFWmonitor *targetMonitor, Dimension *screenDim, char **err
     return false;
 }
 
-#include <stdio.h>
 char *interface_init(void (*glfw_error)(int, const char*)) {
     glfwSetErrorCallback(glfw_error);
     if (glfwInit() == GL_FALSE) return INTERFACE_BAD_GLFW_INIT;
@@ -63,7 +62,6 @@ void *window_init(Dimension size, char *windowName, char **errVal) {
         gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     }
     else *errVal = INTERFACE_BAD_GLFW_WIN;
-    printf("%s\n", glGetString(GL_VERSION));
     return newWindow;
 }
 
