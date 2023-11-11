@@ -29,9 +29,13 @@ static bool get_dim(GLFWmonitor *targetMonitor, Dimension *screenDim, char **err
     return false;
 }
 
-char *interface_init(void (*glfw_error)(int, const char*)) {
+static void glfw_framebuffer_size_adjust(GLFWwindow *window, int w, int h) {
+    glViewport(0, 0, w, h);
+}
+
+char *interface_init(void (*glfw_error)(int, const char*)) { // TODO: Add structure that allows you to define pointer for any callback
     glfwSetErrorCallback(glfw_error);
-    if (glfwInit() == GL_FALSE) return INTERFACE_BAD_GLFW_INIT;
+    if(glfwInit() == GL_FALSE) return INTERFACE_BAD_GLFW_INIT;
 
     #ifndef OPENGL_VER
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -39,11 +43,13 @@ char *interface_init(void (*glfw_error)(int, const char*)) {
     #else
     float integerSegment;
     float fractionSegment = modff(OPENGL_VER, &integerSegment);
-    assert(fractionSegment != NAN || integerSegment == INFINITY);
+    assert(fractionSegment != NAN && integerSegment != INFINITY);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, (int) integerSegment);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, (int) ceil(fractionSegment * 10));
     #endif
+
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
     return NULL;
 }
 
@@ -53,15 +59,35 @@ bool interface_get_dim(Dimension *screenDim, char **errVal) {
     return get_dim(primaryMonitor, screenDim, errVal);
 }
 
-void *window_init(Dimension size, char *windowName, char **errVal) {
+void interface_cut_dim(Dimension *targetDim, float portion, float scale, bool xScaled) {
+    int *primary = &targetDim->height;
+    int *secondary = &targetDim->width;
+    if(xScaled) {
+        primary = &targetDim->width;
+        secondary = &targetDim->height;
+    }
+    *primary *= portion;
+    *secondary = *primary * scale;
+}
+
+void *window_init(Dimension size, char *windowName, WinSetup win_setup, char **errVal) {
     if(size.width == 0 || size.height == 0 || windowName == NULL || errVal == NULL) return NULL;
     GLFWwindow* newWindow = glfwCreateWindow(size.width, size.height, windowName, NULL, NULL);
 
-    if (newWindow != NULL) {
-        glfwMakeContextCurrent(newWindow);
-        gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    if (newWindow == NULL) {
+        *errVal = INTERFACE_BAD_GLFW_WIN;
+        return NULL;
     }
-    else *errVal = INTERFACE_BAD_GLFW_WIN;
+    glfwMakeContextCurrent(newWindow);
+    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+
+    if(win_setup != NULL && win_setup(newWindow)) {
+        glfwDestroyWindow(newWindow);
+        *errVal = INTERFACE_WIN_SETUP_FAIL;
+        return NULL;
+    }
+    glViewport(0, 0, size.width, size.height);
+    glfwSetFramebufferSizeCallback(newWindow, glfw_framebuffer_size_adjust);
     return newWindow;
 }
 

@@ -1,3 +1,5 @@
+RELEASE = FALSE
+
 ifeq ($(OS),Windows_NT)
 	EXEC = exe
 	LFLAGS = -lglfw3 -lopengl32 -lgdi32 -lm
@@ -6,13 +8,19 @@ else
 	LFLAGS = -lglfw3 -lGL -lm
 endif
 
+ifeq ($(RELEASE), TRUE)
+	CFLAGS = -O2 -DNDEBUG
+else
+	CFLAGS = -g -Wall
+endif
+
 ifndef GL_VER
 	GL_VER = 4.5
 endif
 
 CC = gcc
 EXT = c
-CFLAGS = -g -Wall -DOPENGL_VER=$(GL_VER)
+DEFINES = -DOPENGL_VER=$(GL_VER)
 INCLUDE = include
 IFLAGS = -I$(INCLUDE)
 SRC = src
@@ -32,11 +40,11 @@ SUBMITNAME = $(PROJECT_NAME).tar
 all: $(BINDIR)
 all: $(BIN)
 
-release: CFLAGS = -O2 -DNDEBUG
-release: all
+release: 
+	make RELEASE=TRUE
 
 $(BIN): $(OBJS)
-	$(CC) $(CFLAGS) $(IFLAGS) $(OBJS) $(DEFINES) -o $@ $(LFLAGS)
+	$(CC) $(CFLAGS) $(IFLAGS) $(OBJS) -o $@ $(LFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.$(EXT)
 	$(CC) $(CFLAGS) $(IFLAGS) $(DEFINES) -c $< -o $@
@@ -53,7 +61,7 @@ clean:
 $(BINDIR):
 	@mkdir -p $(BINDIR) $(OBJ)
 	@tar -xf $(LIBS)
-	@make $(BIN)
+	@make RELEASE=$(RELEASE) $(BIN)
 
 new: clean
 new: all
