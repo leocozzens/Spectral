@@ -11,14 +11,25 @@
 
 #define VERTEX_ELEM                             3
 
-typedef union {
-    struct {
-        float x;
-        float y;
-        float z;
+typedef struct {
+    union {
+        float pos[VERTEX_ELEM];
+        struct {
+            float x;
+            float y;
+            float z;
+        };
     };
-    float pos[VERTEX_ELEM];
+    union {
+        float color[VERTEX_ELEM];
+        struct {
+            float r;
+            float g;
+            float b;
+        };
+    };
 } Vertex;
+
 
 typedef struct _DrawDetails {
     unsigned int VAO, numElems;

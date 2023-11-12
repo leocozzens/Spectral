@@ -19,12 +19,14 @@ ifndef GL_VER
 endif
 
 CC = gcc
+EXTRACTOR = tools/exlit.$(EXEC)
 EXT = c
 DEFINES = -DOPENGL_VER=$(GL_VER)
 INCLUDE = include
 IFLAGS = -I$(INCLUDE)
 SRC = src
 OBJ = obj
+SHADERS = $(SRC)/shaders
 LIB = pkgs
 BINDIR = bin
 PROJNAME = GLUI
@@ -33,12 +35,13 @@ LIBS = $(LIB)/glad_gl=$(GL_VER).tar
 LIBSRCS = $(INCLUDE)/glad $(INCLUDE)/KHR $(SRC)/glad.c
 SRCS = $(wildcard $(SRC)/*.$(EXT))
 OBJS = $(patsubst $(SRC)/%.$(EXT), $(OBJ)/%.o, $(SRCS))
+SHADER_FILES = $(wildcard $(SHADERS)/*.glsl)
+SHADER_RAWS = $(patsubst $(SHADERS)/%.glsl, $(INCLUDE)/%_shader.h, $(SHADER_FILES))
 BIN = $(BINDIR)/$(BINNAME)
 
-SUBMITNAME = $(PROJECT_NAME).tar
+SUBMITNAME = $(PROJNAME).tar
 
 all: $(BINDIR)
-all: $(BIN)
 
 release: 
 	make RELEASE=TRUE
@@ -49,6 +52,9 @@ $(BIN): $(OBJS)
 $(OBJ)/%.o: $(SRC)/%.$(EXT)
 	$(CC) $(CFLAGS) $(IFLAGS) $(DEFINES) -c $< -o $@
 
+$(INCLUDE)/%_shader.h: $(SHADERS)/%.glsl
+	$(EXTRACTOR) $< $@
+
 %.o: $(SRC)/%.$(EXT)
 	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $(OBJ)/$@	
 
@@ -56,12 +62,13 @@ link: $(OBJS)
 	$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) $(OBJS) -o $(BIN)
 
 clean:
-	rm -r $(BINDIR) $(OBJ) $(LIBSRCS)
+	rm -r $(BINDIR) $(OBJ) $(LIBSRCS) $(EXTRACTOR) $(SHADER_RAWS)
 
 $(BINDIR):
+	$(CC) $(CFLAGS) tools/extract_literals.c -o $(EXTRACTOR)
 	@mkdir -p $(BINDIR) $(OBJ)
 	@tar -xf $(LIBS)
-	@make RELEASE=$(RELEASE) $(BIN)
+	@make $(SHADER_RAWS) RELEASE=$(RELEASE) $(BIN)
 
 new: clean
 new: all

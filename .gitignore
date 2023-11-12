@@ -62,3 +62,7 @@ obj/
 src/glad.c
 include/glad/
 include/KHR/
+
+# Precompiled headers
+include/vertex_shader.h
+include/fragment_shader.h

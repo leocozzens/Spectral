@@ -1,6 +1,7 @@
+// C standard headers
+#include <stddef.h>
 // External libraries
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 // Local headers
 #include <data.h>
 
@@ -8,23 +9,25 @@
 
 DrawDetails render_establish_mesh(VertexList vList, ElemList eList) {
     GLuint VAO;
-    GLuint objectBuffers[2]; // VBO and EBO
+    GLuint bufferObjects[2]; // VBO and EBO
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    glGenBuffers(2, objectBuffers);
+    glGenBuffers(2, bufferObjects);
 
-    glBindBuffer(GL_ARRAY_BUFFER, objectBuffers[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, bufferObjects[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vList.count, vList.list, GL_STATIC_DRAW);
     glVertexAttribPointer(0, VERTEX_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, pos));
+    glVertexAttribPointer(1, VERTEX_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, color));
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objectBuffers[1]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferObjects[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * eList.count, eList.list, GL_STATIC_DRAW);
 
     UNBIND_VERTEX_ARRAY;
-    glDeleteBuffers(2, objectBuffers);
+    glDeleteBuffers(2, bufferObjects);
 
     DrawDetails details = { VAO, vList.count };
     return details;
