@@ -16,45 +16,54 @@
 
 #define S_LEN(_literal)             (sizeof(_literal) - 1)
 #define SET_ERR(_setter)            errorMsg = _setter
-#define HANDLE_ERR(_msg, _callback) if(_msg != NULL) (_msg == memErr) ? _callback(2, memErr) : _callback(1, _msg), free(_msg)
+#define HANDLE_ERR(_msg, _callback) if(_msg != NULL) (_msg == memErr || _msg == noShaderLog || _msg == noLinkerLog) ? _callback(2, _msg) : _callback(1, _msg), free(_msg)
 
-static GLint result = 0;
 static char *memErr = "Insufficient memory";
+static char *noShaderLog = "Unlisted OpenGL shader compilation error";
+static char *noLinkerLog = "Unlisted OpenGL shader linking error";
 
 static char *compile_shader(GLuint ShaderID, const GLchar *const *shaderData) {
-    char *errorMsg = NULL;
-    static GLint result = 0;
-    GLint logLen;
-
     glShaderSource(ShaderID, 1, shaderData, NULL);
     glCompileShader(ShaderID);
 
-    glGetShaderiv(ShaderID, GL_COMPILE_STATUS, &result);
-	glGetShaderiv(ShaderID, GL_INFO_LOG_LENGTH, &logLen);
-	if (logLen > 0) {
-		errorMsg = malloc(logLen + 1);
-        if(errorMsg == NULL) return memErr; 
-		glGetShaderInfoLog(ShaderID, logLen, NULL, errorMsg);
-	}
-    return errorMsg;
+    GLint success = 0;
+    glGetShaderiv(ShaderID, GL_COMPILE_STATUS, &success);
+    if(success != GL_TRUE) {
+        GLint logLen = 0;
+        char *errorMsg;
+        glGetShaderiv(ShaderID, GL_INFO_LOG_LENGTH, &logLen);
+        if (logLen > 0) {
+            errorMsg = malloc(logLen + 1);
+            if(errorMsg == NULL) return memErr; 
+            glGetShaderInfoLog(ShaderID, logLen, NULL, errorMsg);
+            return errorMsg;
+        }
+        return noShaderLog;
+    }
+    return NULL;
 }
 
 static char *link_shaders(GLuint *ProgramID, GLuint VertexShaderID, GLuint FragmentShaderID) {
-    char *errorMsg = NULL;
-    GLint logLen;
 	*ProgramID = glCreateProgram();
 	glAttachShader(*ProgramID, VertexShaderID);
 	glAttachShader(*ProgramID, FragmentShaderID);
 	glLinkProgram(*ProgramID);
 
-	glGetProgramiv(*ProgramID, GL_LINK_STATUS, &result);
-	glGetProgramiv(*ProgramID, GL_INFO_LOG_LENGTH, &logLen);
-	if (logLen > 0) {
-		errorMsg = malloc(logLen + 1);
-        if(errorMsg == NULL) return memErr;
-		glGetProgramInfoLog(*ProgramID, logLen, NULL, errorMsg);
-	}
-    return errorMsg;
+    GLint success;
+    glGetProgramiv(*ProgramID, GL_LINK_STATUS, &success);
+    if(success != GL_TRUE) {
+        GLint logLen = 0;
+        char *errorMsg;
+        glGetProgramiv(*ProgramID, GL_INFO_LOG_LENGTH, &logLen);
+        if (logLen > 0) {
+            errorMsg = malloc(logLen + 1);
+            if(errorMsg == NULL) return memErr;
+            glGetProgramInfoLog(*ProgramID, logLen, NULL, errorMsg);
+            return errorMsg;
+        }
+        return noLinkerLog;
+    }
+    return NULL;
 }
 
 static void cleanup_shader(GLuint ProgramID, GLuint ShaderID) {

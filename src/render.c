@@ -20,8 +20,8 @@ DrawDetails render_establish_mesh(VertexList vList, ElemList eList) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vList.count, vList.list, GL_STATIC_DRAW);
     glVertexAttribPointer(0, VERTEX_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, pos));
     glVertexAttribPointer(1, VERTEX_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, color));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(0); // Vertices position
+    glEnableVertexAttribArray(1); // Vertices color
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferObjects[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * eList.count, eList.list, GL_STATIC_DRAW);
