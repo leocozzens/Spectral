@@ -25,13 +25,12 @@ int main(void) {
     Dimension screenDim;
     ERR_OUT(interface_get_dim(&screenDim, &errVal), errVal);
     interface_cut_dim(&screenDim, Y_PORTION, X_SCALE, false);
-    
-    void *primaryWin = window_init(screenDim, WINDOW_NAME, display_setup, &errVal);
-    ERR_OUT(primaryWin == NULL, errVal);
 
-    int exitVal = window_run(primaryWin, display_cycle);
+    WinTools mainWinToolset = { display_cycle, display_setup, display_cleanup }; // TODO: Make window implementation threaded
+    void *mainWin = interface_window_init(screenDim, WINDOW_NAME, &mainWinToolset, NULL, &errVal);
+    ERR_OUT(mainWin == NULL, errVal);
 
-    display_cleanup();
+    int exitVal = interface_window_run(mainWin);
     interface_cleanup();
     return exitVal;
 }

@@ -37,12 +37,13 @@ static float random_float(float max) {
 bool display_setup(void *window) {
     glClearColor(SLATE);
     srand(time(NULL));
-    Vertex vertices[3] = {
-        {{{ 0.0F, 0.5F, 0.0F }}, {{ random_float(1.0), random_float(1.0), random_float(1.0) }}}, // Top corner
-        {{{ -0.5F, -0.5F, 0.0F }}, {{ random_float(1.0), random_float(1.0), random_float(1.0) }}}, // Bottom left corner
-        {{{ 0.5F, -0.5F, 0.0 }}, {{ random_float(1.0), random_float(1.0), random_float(1.0) }}}
+    Vertex vertices[4] = {
+        {{{ -1.0F, 1.0F }}, {{ random_float(1.0), random_float(1.0), random_float(1.0), 1.0F }}},
+        {{{ -1.0F, -1.0F }}, {{ random_float(1.0), random_float(1.0), random_float(1.0), 1.0F }}},
+        {{{ 1.0F, 1.0F }}, {{ random_float(1.0), random_float(1.0), random_float(1.0), 1.0F }}},
+        {{{ 1.0F, -1.0F }}, {{ random_float(1.0), random_float(1.0), random_float(1.0), 1.0F }}}
     };
-    unsigned int elems[] = { 0, 1, 2 };
+    unsigned int elems[] = { 0, 1, 2, 3, 0};
 
     VertexList vList = { vertices, sizeof(vertices) / sizeof(Vertex), 0 };
     ElemList eList = { elems, sizeof(elems) / sizeof(unsigned int), 0 };
@@ -72,14 +73,14 @@ bool display_setup(void *window) {
 }
 
 bool display_cycle(void *window, int *exitVal) {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(mainShader);
 
     render_draw(dList);
     return false;
 }
 
-void display_cleanup(void) {
+void display_cleanup(void *window) {
     render_delete_mesh(dList);
     KILL_LIST(dList);
 }

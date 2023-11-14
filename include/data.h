@@ -9,23 +9,24 @@
 #define ADDTO_LIST(_list, _newItem)             data_array_add((void**) &(_list.list), (const void*) &(_newItem), &(_list.count), &(_list.capacity), sizeof(_newItem))
 #define KILL_LIST(_list)                        data_array_kill((void**) &(_list.list), &(_list.count), &(_list.capacity))
 
-#define VERTEX_ELEM                             3
+#define POSITION_ELEM                           2
+#define COLOR_ELEM                              4
 
 typedef struct {
     union {
-        float pos[VERTEX_ELEM];
+        float pos[POSITION_ELEM];
         struct {
             float x;
             float y;
-            float z;
         };
     };
     union {
-        float color[VERTEX_ELEM];
+        float color[COLOR_ELEM];
         struct {
             float r;
             float g;
             float b;
+            float a;
         };
     };
 } Vertex;

@@ -4,16 +4,10 @@
 
 #define GROWTH_FACTOR   2
 
-static void *local_memcpy(void *dest, const void *src, unsigned int n) {
-    char *cDest = dest;
-    const char *cSrc = src;
+// Local function prototypes
+static void *local_memcpy(void *dest, const void *src, unsigned int n);
 
-    for(unsigned int i = 0; i < n; i++) {
-        *cDest++ = *cSrc++;
-    }
-    return dest;
-}
-
+// Public functions
 void *data_array_init(unsigned int initSize, unsigned int elemSize) {
     return malloc(initSize * elemSize);
 }
@@ -40,4 +34,15 @@ void data_array_kill(void **arr, unsigned int *size, unsigned int *capacity) {
     *arr = NULL;
     *size = 0;
     *capacity = 0;
+}
+
+// Local function definitions
+static void *local_memcpy(void *dest, const void *src, unsigned int n) {
+    char *cDest = dest;
+    const char *cSrc = src;
+
+    for(unsigned int i = 0; i < n; i++) {
+        *cDest++ = *cSrc++;
+    }
+    return dest;
 }

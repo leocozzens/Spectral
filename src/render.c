@@ -18,8 +18,8 @@ DrawDetails render_establish_mesh(VertexList vList, ElemList eList) {
 
     glBindBuffer(GL_ARRAY_BUFFER, bufferObjects[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vList.count, vList.list, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, VERTEX_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, pos));
-    glVertexAttribPointer(1, VERTEX_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, color));
+    glVertexAttribPointer(0, POSITION_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, pos));
+    glVertexAttribPointer(1, COLOR_ELEM, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*) offsetof(Vertex, color));
     glEnableVertexAttribArray(0); // Vertices position
     glEnableVertexAttribArray(1); // Vertices color
 
@@ -42,7 +42,7 @@ void render_delete_mesh(DrawList dList) {
 void render_draw(DrawList dList) {
     for(unsigned int i = 0; i < dList.count; i++) {
         glBindVertexArray(dList.list[i].VAO);
-        glDrawElements(GL_TRIANGLES, dList.list[i].numElems, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_TRIANGLE_STRIP, dList.list[i].numElems, GL_UNSIGNED_INT, NULL);
     }
     UNBIND_VERTEX_ARRAY;
 }
