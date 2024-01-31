@@ -18,7 +18,10 @@ ifndef GL_VER
 	GL_VER = 4.5
 endif
 
-CC = gcc
+ifndef CC
+	CC = gcc
+endif
+
 EXTRACTOR = tools/exlit.$(EXEC)
 EXT = c
 DEFINES = -DOPENGL_VER=$(GL_VER)

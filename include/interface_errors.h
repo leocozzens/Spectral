@@ -11,6 +11,9 @@
 #define INTERFACE_INVALID_SIZE      "Invalid screen size for relevant monitor"
 
 #define INTERFACE_WIN_SETUP_FAIL    "Window setup failed"
-#define INTERFACE_BAD_WINDOW_INPUT  "Improper window initialization values"
+#define INTERFACE_BAD_WINDOW_CREATE "Improper window creation parameters"
+#define INTERFACE_BAD_WINDOW_INIT   "Improper window initialization parameters"
+
+#define INTERFACE_BAD_GL_CONTEXT    "Failed to initialize OpenGL context"
 
 #endif

@@ -79,7 +79,7 @@ void *interface_window_init(Dimension size, char *windowName, WinTools *winTools
     char *errFallback;
     if(errVal == NULL) errVal = &errFallback;
     if(size.width == 0 || size.height == 0 || windowName == NULL || winToolset == NULL || winToolset->cycle_win == NULL) {
-        *errVal = INTERFACE_BAD_WINDOW_INPUT;
+        *errVal = INTERFACE_BAD_WINDOW_CREATE;
         return NULL;
     }
     GLFWwindow* newWindow = glfwCreateWindow(size.width, size.height, windowName, NULL, NULL);
