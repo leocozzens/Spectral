@@ -51,18 +51,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Binaries
-bin/
-obj/
+# VSCode settings
+.VSCode
 
-# VSCODE
-.vscode
-
-# Additional libraries
-src/glad.c
-include/glad/
-include/KHR/
-
-# Precompiled headers
-include/vertex_shader.h
-include/fragment_shader.h
+# CMake build directory
+build/
