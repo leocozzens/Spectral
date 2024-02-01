@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22.1)
 
 # Sources and test naming
 set(NAME "run_tests")
-set(TEST_SRCS demo_tests.c)
+set(TEST_SRCS test_main.c test_errors.c example.c)
 set(FRAMEWORK Unity)
 
 # Assemble the testing framework
@@ -34,4 +34,9 @@ set_target_properties(
 )
 
 # Run tests
-add_test(NAME ${NAME} COMMAND ${NAME})
+function(run_test TEST_ID)
+    add_test(NAME ${TEST_ID} COMMAND ${NAME} ${TEST_ID})
+endfunction()
+
+run_test(testExample)
+run_test(testExample1)
