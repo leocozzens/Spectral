@@ -1,4 +1,9 @@
+# CMake version settings
 cmake_minimum_required(VERSION 3.22.1)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.18)
+    cmake_policy(SET CMP0135 NEW)
+endif()
+# Project data
 project(Spectral VERSION 0.1 LANGUAGES C)
 
 # General build settings
@@ -16,20 +21,31 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # Source files
 set(SRCDIR src/)
 set(MAIN_SRC main.c)
-set(MODULES test.c)
+set(MODULES renderer.c shader_tools.c windower.c)
 list(TRANSFORM MAIN_SRC PREPEND ${SRCDIR})
 list(TRANSFORM MODULES PREPEND ${SRCDIR})
 
 # Dependencies
+include(scripts/cmake/GetRemote.cmake)
+set(GLFW_VERSION 3.3.9)
+set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "GLFW should not build examples")
+set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "GLFW should not build or run tests")
+GetRemote(
+    NAME        glfw
+    VERSION     ${GLFW_VERSION}
+    URL         https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
+    DESTINATION ${CMAKE_SOURCE_DIR}/lib
+)
+set(DEPENDENCIES glfw)
+# Set primary includes directory
 set(
     PRIMARY_INCLUDES 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-set(DEPENDENCIES "")
 
 # Enable/disable tests
 option(INCLUDE_TESTS "Include tests" OFF)
-message(STATUS "Tests are ${INCLUDE_TESTS}")
+message(STATUS "Project tests are ${INCLUDE_TESTS}")
 
 # Build primary executable and optionally execute tests
 if(INCLUDE_TESTS)
@@ -40,12 +56,15 @@ if(INCLUDE_TESTS)
         ${COMMON_LIB} PUBLIC
         ${PRIMARY_INCLUDES}
     )
+    target_link_libraries(
+        ${COMMON_LIB} PUBLIC
+        ${DEPENDENCIES}
+    )
     add_subdirectory(tests)
     add_executable(${PROJECT_NAME} ${MAIN_SRC})
     target_link_libraries(
         ${PROJECT_NAME} PRIVATE
         ${COMMON_LIB}
-        ${DEPENDENCIES}
     )
 else()
     set(SRCS ${MAIN_SRC} ${MODULES})

@@ -1,6 +1,6 @@
-#include <test.h>
+#include <GLFW/glfw3.h>
 
 int main(void) {
-    print_test();
+
     return 0;
 }

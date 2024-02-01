@@ -25,7 +25,6 @@ target_link_libraries(
     ${NAME} PRIVATE
     ${FRAMEWORK}
     ${COMMON_LIB}
-    ${DEPENDENCIES}
 )
 set(BINDIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set_target_properties(
