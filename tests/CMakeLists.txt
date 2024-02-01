@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 3.27.9)
 
 # Sources and test naming
 set(NAME "run_tests")
@@ -6,13 +6,10 @@ set(TEST_SRCS test_main.c test_errors.c example.c)
 set(FRAMEWORK Unity)
 
 # Assemble the testing framework
-add_library(
-    ${FRAMEWORK} STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendors/Unity/src/unity.c
-)
-target_include_directories(
-    ${FRAMEWORK} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendors/Unity/src
+GetRepo(
+    NAME        ${FRAMEWORK}
+    SOURCES     src/unity.c
+    INCLUDES    src
 )
 
 # Create test executable

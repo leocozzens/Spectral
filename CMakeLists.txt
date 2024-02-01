@@ -1,5 +1,5 @@
 # CMake version settings
-cmake_minimum_required(VERSION 3.22.1)
+cmake_minimum_required(VERSION 3.27.9)
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.18)
     cmake_policy(SET CMP0135 NEW)
 endif()
@@ -10,7 +10,7 @@ project(Spectral VERSION 0.1 LANGUAGES C)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_FLAGS_DEBUG "-g -Wall -O0")
-set(CMAKE_C_FLAGS_RELEASE "-O2")
+set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
 
 # Build type detection
 if(NOT CMAKE_BUILD_TYPE)
@@ -26,17 +26,8 @@ list(TRANSFORM MAIN_SRC PREPEND ${SRCDIR})
 list(TRANSFORM MODULES PREPEND ${SRCDIR})
 
 # Dependencies
-include(scripts/cmake/GetRemote.cmake)
-set(GLFW_VERSION 3.3.9)
-set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "GLFW should not build examples")
-set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "GLFW should not build or run tests")
-GetRemote(
-    NAME        glfw
-    VERSION     ${GLFW_VERSION}
-    URL         https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
-    DESTINATION ${CMAKE_SOURCE_DIR}/lib
-)
-set(DEPENDENCIES glfw)
+include(scripts/cmake/remotes.cmake)
+add_subdirectory(lib)
 # Set primary includes directory
 set(
     PRIMARY_INCLUDES 

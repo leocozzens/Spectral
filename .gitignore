@@ -56,4 +56,3 @@ dkms.conf
 
 # CMake build directory
 build/
-lib/
