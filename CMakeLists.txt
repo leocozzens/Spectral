@@ -21,13 +21,34 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # Source files
 set(SRCDIR src/)
 set(MAIN_SRC main.c)
-set(MODULES renderer.c shader_tools.c windower.c)
+set(MODULES dimension.c renderer.c result.c shader_tools.c windower.c)
 list(TRANSFORM MAIN_SRC PREPEND ${SRCDIR})
 list(TRANSFORM MODULES PREPEND ${SRCDIR})
 
 # Dependencies
+include(scripts/cmake/setter.cmake)
 include(scripts/cmake/remotes.cmake)
-add_subdirectory(lib)
+
+set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
+set(DISABLES GLFW_BUILD_DOCS GLFW_BUILD_TESTS GLFW_BUILD_EXAMPLES)
+DisableSettings("${DISABLES}")
+
+set(GLFW_VERSION 3.3.9)
+GetRemoteURL(
+    NAME        glfw
+    VERSION     ${GLFW_VERSION}
+    URL         https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip
+    PARENT_DIR  ${LIB_DIR}
+)
+# Add GL versioning
+GetRemoteTag(
+    NAME        glad
+    REPO        https://github.com/Dav1dde/glad.git
+    TAG         master
+    PARENT_DIR  ${LIB_DIR}
+)
+
+set(DEPENDENCIES glfw glad)
 # Set primary includes directory
 set(
     PRIMARY_INCLUDES 

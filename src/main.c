@@ -1,38 +1,30 @@
 // C standard headers
 #include <stdio.h>
-// GL loader
+// External libraries
 #include <glad/glad.h>
-// Windowing API
 #include <GLFW/glfw3.h>
 // Local headers
+#include <result.h>
+#include <dimension.h>
+#include <windower.h>
 #include <renderer.h>
 
-void testErr(int a, const char *err) {
-    fprintf(stderr, "GLFW ERR: %s\n", err);
-}
-
-static void viewport_size_adjust(GLFWwindow *win, int x, int y) {
-    glViewport(0, 0, x, y);
-    renderer_draw(win);
-}
+#define FATAL_ERR_FMT                   "FATAL ERROR: %s\nExiting program\n"
+#define CHECK_RESULT(_result, _actions) if(_result.code != 0) { \
+                                            fprintf(stderr, FATAL_ERR_FMT, _result.msg); \
+                                            _actions; \
+                                            return _result.code; \
+                                        }
 
 int main(void) {
-    if(glfwInit() == GL_FALSE) {
-        glfwTerminate();
-        return 1;
-    }
+    Result retData = STANDARD_SUCCESS;
+    retData = windower_init();
+    CHECK_RESULT(retData,);
 
-    glfwSetErrorCallback(testErr);
-    GLFWwindow *master = glfwCreateWindow(600, 480, "Test", NULL, NULL);
-    if(master == NULL) {
-        glfwTerminate();
-        fprintf(stderr, "ERROR: Window failed\n");
-        return 1;
-    }
-    glfwMakeContextCurrent(master);
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-    glfwSetFramebufferSizeCallback(master, viewport_size_adjust);
-    glViewport(0, 0, 600, 480);
+    GLFWwindow *master;
+    retData = window_create((void**) &master, create_dimension(600, 480), "Test window 123");
+    CHECK_RESULT(retData, glfwTerminate());
+
     while(!glfwWindowShouldClose(master)) {
         glfwPollEvents();
         renderer_draw(master);
