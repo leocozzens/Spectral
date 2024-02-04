@@ -70,8 +70,8 @@ void d_array_remove(void *arr, size_t index, size_t itemSize) {
         arrMeta->len--;
         return;
     }
-    void *curr = (char*) arr + index;
-    void *last = (char*) arr + arrMeta->len;
+    void *curr = (char*) arr + index * itemSize;
+    void *last = (char*) arr + (arrMeta->len - 1) * itemSize;
     arrMeta->len--;
     memcpy(curr, last, itemSize);
 }
