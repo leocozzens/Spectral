@@ -29,7 +29,10 @@ typedef struct {
     WindowMain winMain;
     Dimension winDim;
     pthread_t thread;
+    pthread_mutex_t threadLock;
+    pthread_cond_t threadSignal;
     void *data;
+    bool resizing;
 } WindowHandle;
 
 static WindowHandle **handleList = NULL;
@@ -76,6 +79,9 @@ Result window_create(Dimension windowDim, const char *windowName, WindowMain win
 
     (*activeHandle)->data = data;
     (*activeHandle)->winMain = winMain;
+    (*activeHandle)->threadLock = PTHREAD_MUTEX_INITIALIZER;
+    (*activeHandle)->threadSignal = PTHREAD_COND_INITIALIZER;
+    (*activeHandle)->resizing = false;
     gl_context_init((*activeHandle)->window);
     glfwSetFramebufferSizeCallback((*activeHandle)->window, viewport_size_adjust);
 
@@ -113,21 +119,43 @@ static void gl_context_init(void *window) {
 }
 
 static void viewport_size_adjust(GLFWwindow *window, int x, int y) {
+    WindowHandle *targetHandle = NULL;
     for(size_t i = 0; i < D_ARRAY_LEN(handleList); i++) {
-        if(window == handleList[i]->window) {
-            handleList[i]->winDim.x = x;
-            handleList[i]->winDim.y = y;
-        }
+        if(window == handleList[i]->window)
+            targetHandle = handleList[i];
     }
+    if(targetHandle == NULL) return;
+
+    targetHandle->resizing = true;
+    pthread_mutex_lock(&targetHandle->threadLock);
+    GLFWwindow *prev = glfwGetCurrentContext();
+    
+    glfwMakeContextCurrent(targetHandle->window);
+    glViewport(0, 0, x, y);
+    targetHandle->winMain(targetHandle->data);
+    glfwSwapBuffers(targetHandle->window);
+    
+    glfwMakeContextCurrent(prev); 
+    targetHandle->resizing = false;
+    pthread_cond_signal(&targetHandle->threadSignal);
+    pthread_mutex_unlock(&targetHandle->threadLock);
 }
 
 static void *window_worker(void *handlePtr) {
     WindowHandle *handle = handlePtr;
+    pthread_mutex_lock(&handle->threadLock);
     glfwMakeContextCurrent(handle->window);
     while(!glfwWindowShouldClose(handle->window)) {
-        handle->winMain(handle->winDim, handle->data);
+        if(handle->resizing) {
+            glfwMakeContextCurrent(NULL);
+            pthread_cond_wait(&handle->threadSignal, &handle->threadLock);
+            glfwMakeContextCurrent(handle->window);
+        }
+
+        handle->winMain(handle->data);
         glfwSwapBuffers(handle->window);
     }
+    pthread_mutex_unlock(&handle->threadLock);
     return NULL;
 }
 
@@ -142,6 +170,8 @@ static bool any_exist(void) {
 static void close_window(size_t index) {
     pthread_join(handleList[index]->thread, NULL);
     glfwDestroyWindow(handleList[index]->window);
+    pthread_mutex_destroy(&handleList[index]->threadLock);
+    pthread_cond_destroy(&handleList[index]->threadSignal);
     free(handleList[index]);
     D_ARRAY_REMOVE(handleList, index);
 }

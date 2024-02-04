@@ -6,8 +6,7 @@
 
 #define SLATE 0.10F, 0.10F, 0.10F, 1.00F
 
-void renderer_draw(Dimension winDim, void *data) {
-    glViewport(0, 0, winDim.width, winDim.height);
+void renderer_draw(void *data) {
     glClearColor(SLATE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
