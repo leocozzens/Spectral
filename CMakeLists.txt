@@ -21,7 +21,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # Source files
 set(SRCDIR src/)
 set(MAIN_SRC main.c)
-set(MODULES dimension.c renderer.c result.c shader_tools.c windower.c)
+set(MODULES d_array.c dimension.c renderer.c result.c shader_tools.c windower.c)
 list(TRANSFORM MAIN_SRC PREPEND ${SRCDIR})
 list(TRANSFORM MODULES PREPEND ${SRCDIR})
 

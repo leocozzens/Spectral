@@ -1,8 +1,5 @@
 // C standard headers
 #include <stdio.h>
-// External libraries
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 // Local headers
 #include <result.h>
 #include <dimension.h>
@@ -15,21 +12,18 @@
                                             _actions; \
                                             return _result.code; \
                                         }
-
+                                        
 int main(void) {
     Result retData = STANDARD_SUCCESS;
     retData = windower_init();
     CHECK_RESULT(retData,);
 
-    GLFWwindow *master;
-    retData = window_create((void**) &master, create_dimension(600, 480), "Test window 123");
-    CHECK_RESULT(retData, glfwTerminate());
+    retData = window_create((Dimension){ 600, 480 }, "TEST ONE", renderer_draw, NULL);
+    CHECK_RESULT(retData, windower_cleanup());
+    retData = window_create((Dimension){ 600, 480 }, "TEST TWO", renderer_draw, NULL);
+    CHECK_RESULT(retData, windower_cleanup());
+    
+    windower_loop();
 
-    while(!glfwWindowShouldClose(master)) {
-        glfwPollEvents();
-        renderer_draw(master);
-    }
-    glfwDestroyWindow(master);
-    glfwTerminate();
     return 0;
 }

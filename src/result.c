@@ -11,12 +11,12 @@
 const Result STANDARD_SUCCESS = { EXIT_SUCCESS, STANDARD_SUCCESS_MSG };
 const Result STANDARD_FAILURE = { EXIT_FAILURE, STANDARD_ERROR_MSG };
 
-Result create_result(int retCode, const char *msg) {
+Result create_result(int code, const char *msg) {
     if(msg == NULL) {
-        if(retCode == 0) msg = STANDARD_SUCCESS_MSG;
-        else msg = STANDARD_SUCCESS_MSG;
+        if(code == 0) msg = STANDARD_SUCCESS_MSG;
+        else msg = STANDARD_ERROR_MSG;
     }
-    Result newResult = { retCode, msg };
+    Result newResult = { code, msg };
     return newResult;
 }
 

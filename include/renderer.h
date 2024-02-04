@@ -1,6 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-void renderer_draw(GLFWwindow *win);
+union Dimension;
+
+void renderer_draw(union Dimension winDim, void *data);
 
 #endif
