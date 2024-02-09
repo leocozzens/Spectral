@@ -21,7 +21,7 @@ if [ "$1" == "$dbg" ] || [ "$2" == "$dbg" ] || [ "$3" == "$dbg" ]; then
     options+=" -DCMAKE_BUILD_TYPE=Debug"
 fi
 if [ "$1" == "$tst" ] || [ "$2" == "$tst" ] || [ "$3" == "$tst" ]; then
-    options+=" -DINCLUDE_TESTS=ON"
+    options+=" -DSPECTRAL_BUILD_TESTSS=ON"
 fi
 
 cmake . -B $dir -G "$target"$options

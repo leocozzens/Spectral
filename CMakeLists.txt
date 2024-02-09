@@ -19,11 +19,15 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Source files
-set(SRCDIR src/)
-set(MAIN_SRC main.c)
-set(MODULES d_array.c dimension.c renderer.c result.c shader_tools.c windower.c)
-list(TRANSFORM MAIN_SRC PREPEND ${SRCDIR})
-list(TRANSFORM MODULES PREPEND ${SRCDIR})
+set(SRC_DIR src/)
+
+set(INTERFACES spectral.c)
+list(TRANSFORM INTERFACES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/)
+
+set(INTERNALS d_array.c dimension.c renderer.c result.c shading.c windower.c)
+list(TRANSFORM INTERNALS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/internal/)
+
+set(MODULES ${INTERNALS} ${INTERFACES})
 
 # Dependencies
 include(scripts/cmake/setter.cmake)
@@ -49,51 +53,41 @@ GetRemoteTag(
 )
 
 set(DEPENDENCIES glfw glad)
-# Set primary includes directory
+
+# Set header locations
 set(
-    PRIMARY_INCLUDES 
+    INTERNAL_INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/internal/include
+)
+set(
+    INTERFACE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Enable/disable tests
-option(INCLUDE_TESTS "Include tests" OFF)
-message(STATUS "Project tests are ${INCLUDE_TESTS}")
+add_library(${PROJECT_NAME} STATIC ${MODULES})
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE
+    ${INTERNAL_INCLUDES}
+    PUBLIC
+    ${INTERFACE_INCLUDES}
+)
+target_link_libraries(
+    ${PROJECT_NAME} PUBLIC
+    ${DEPENDENCIES}
+)
 
-# Build primary executable and optionally execute tests
-if(INCLUDE_TESTS)
+# Enable/disable and run tests
+option(SPECTRAL_BUILD_TESTS "Include tests" OFF)
+message(STATUS "Project tests are ${SPECTRAL_BUILD_TESTS}")
+if(${SPECTRAL_BUILD_TESTS})
     enable_testing()
-    set(COMMON_LIB modules)
-    add_library(${COMMON_LIB} STATIC ${MODULES})
-    target_include_directories(
-        ${COMMON_LIB} PUBLIC
-        ${PRIMARY_INCLUDES}
-    )
-    target_link_libraries(
-        ${COMMON_LIB} PUBLIC
-        ${DEPENDENCIES}
-    )
     add_subdirectory(tests)
-    add_executable(${PROJECT_NAME} ${MAIN_SRC})
-    target_link_libraries(
-        ${PROJECT_NAME} PRIVATE
-        ${COMMON_LIB}
-    )
-else()
-    set(SRCS ${MAIN_SRC} ${MODULES})
-    add_executable(${PROJECT_NAME} ${SRCS})
-    target_link_libraries(
-        ${PROJECT_NAME} PRIVATE
-        ${DEPENDENCIES}
-    )
-    target_include_directories(
-        ${PROJECT_NAME} PRIVATE
-        ${PRIMARY_INCLUDES}
-    )
 endif()
 
-# Set output directory primary executable
-set(BINDIR ${CMAKE_BINARY_DIR}/bin)
-set_target_properties(
-    ${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${BINDIR}
-)
+# Build primary executable
+option(SPECTRAL_BUILD_APP "Build primary executable" ON)
+if(${SPECTRAL_BUILD_APP})
+    message(STATUS "Building primary executable for ${PROJECT_NAME}")
+    add_subdirectory(app)
+endif()

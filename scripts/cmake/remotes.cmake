@@ -35,7 +35,7 @@ endfunction()
 function(GetRepo)
     cmake_parse_arguments(REPO "" "NAME;VERSION;PATH;INCLUDES;SOURCES" "" ${ARGN})
     if(NOT REPO_PATH)
-        set(REPO_PATH ${CMAKE_SOURCE_DIR}/vendors)
+        set(REPO_PATH ${CMAKE_SOURCE_DIR}/external)
     endif()
 
     message(STATUS "REPO PATH: ${REPO_PATH}")
