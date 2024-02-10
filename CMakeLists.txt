@@ -79,8 +79,7 @@ target_link_libraries(
     ${DEPENDENCIES}
 )
 
-# Enable/disable and run tests
-option(SPECTRAL_BUILD_TESTS "Include tests" OFF)
+option(SPECTRAL_BUILD_TESTS "Enable tests" OFF)
 if(${SPECTRAL_BUILD_TESTS})
     message(STATUS "${PROJECT_NAME} tests are enabled")
     enable_testing()
@@ -89,18 +88,10 @@ else()
     message(STATUS "${PROJECT_NAME} tests are disabled")
 endif()
 
-option(SPECTRAL_BUILD_EXAMPLES "Build example executables" ON)
+option(SPECTRAL_BUILD_EXAMPLES "Build example executables" OFF)
 if(${SPECTRAL_BUILD_EXAMPLES})
     message(STATUS "Example executables are enabled for ${PROJECT_NAME}")
     add_subdirectory(examples)
 else()
     message(STATUS "Example executables are disabled for ${PROJECT_NAME}")
-endif()
-
-option(SPECTRAL_BUILD_APP "Build primary executable" ON)
-if(${SPECTRAL_BUILD_APP})
-    message(STATUS "Primary executable enabled for ${PROJECT_NAME}")
-    add_subdirectory(app)
-else()
-    message(STATUS "Primary executable disabled for ${PROJECT_NAME}")
 endif()

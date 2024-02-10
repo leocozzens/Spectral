@@ -23,11 +23,11 @@ An in-depth paragraph about your project and overview of use.
 ### Dependencies
 #### Compile dependencies
 ---
-* __GLFW__ >1.0
+* __GLFW__ >3.3.9
     - Windowing framework.
-* __glad__ >1.0
+* __glad__
     - Loader for OpenGL function pointers.
-* __Unity__ >1.0
+* __Unity__
     - Minimal testing framework used to establish tests
 #### Runtime Dependencies
 ---
