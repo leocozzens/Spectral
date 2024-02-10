@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.27.9)
 
-CompileApp(
-    NAME "${PROJECT_NAME}v${PROJECT_VERSION}"
+CompileExample(
+    NAME window_ex
     INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
-    SRC_DIR main
     SRCS main.c
 )

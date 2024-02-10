@@ -41,4 +41,4 @@ CD %dir%
 make
 
 ECHO.
-ECHO Executable located in %cd%\bin
+ECHO Output located in %cd%

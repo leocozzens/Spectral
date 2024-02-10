@@ -30,8 +30,10 @@ list(TRANSFORM INTERNALS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/internal
 set(MODULES ${INTERNALS} ${INTERFACES})
 
 # Dependencies
-include(scripts/cmake/setter.cmake)
-include(scripts/cmake/remotes.cmake)
+set(SCRIPT_DIR ${CMAKE_SOURCE_DIR}/scripts/cmake)
+include(${SCRIPT_DIR}/setter.cmake)
+include(${SCRIPT_DIR}/remotes.cmake)
+include(${SCRIPT_DIR}/compile_tools.cmake)
 
 set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 set(DISABLES GLFW_BUILD_DOCS GLFW_BUILD_TESTS GLFW_BUILD_EXAMPLES)
@@ -79,15 +81,26 @@ target_link_libraries(
 
 # Enable/disable and run tests
 option(SPECTRAL_BUILD_TESTS "Include tests" OFF)
-message(STATUS "Project tests are ${SPECTRAL_BUILD_TESTS}")
 if(${SPECTRAL_BUILD_TESTS})
+    message(STATUS "${PROJECT_NAME} tests are enabled")
     enable_testing()
     add_subdirectory(tests)
+else()
+    message(STATUS "${PROJECT_NAME} tests are disabled")
 endif()
 
-# Build primary executable
+option(SPECTRAL_BUILD_EXAMPLES "Build example executables" ON)
+if(${SPECTRAL_BUILD_EXAMPLES})
+    message(STATUS "Example executables are enabled for ${PROJECT_NAME}")
+    add_subdirectory(examples)
+else()
+    message(STATUS "Example executables are disabled for ${PROJECT_NAME}")
+endif()
+
 option(SPECTRAL_BUILD_APP "Build primary executable" ON)
 if(${SPECTRAL_BUILD_APP})
-    message(STATUS "Building primary executable for ${PROJECT_NAME}")
+    message(STATUS "Primary executable enabled for ${PROJECT_NAME}")
     add_subdirectory(app)
+else()
+    message(STATUS "Primary executable disabled for ${PROJECT_NAME}")
 endif()

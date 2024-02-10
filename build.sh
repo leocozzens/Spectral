@@ -28,4 +28,4 @@ cmake . -B $dir -G "$target"$options
 
 cd $dir
 make
-echo -e "\nExecutable located in $PWD/bin"
+echo -e "\nOutput located in $PWD"
